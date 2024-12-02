@@ -1,31 +1,51 @@
-"use client";
+import React from "react";
+import { CompanyListItem } from "../components/companies/CompanyListItem";
+import { AlertMessage } from "../components/base/AlertMessage";
+import { getCompanies } from "../service/company/company";
+import { Suspense } from "react";
+import { Loading } from "../components/base/Loading";
 
-import { Inter } from "@next/font/google";
-import { useEffect, useState } from "react";
-const inter = Inter({ subsets: ["latin"] });
+export default async function Home() {
+  const { companies, error } = await getCompanies();
 
-export default function Home() {
-  const [stuff1, setStuff1] = useState<any>([]);
-  useEffect(() => {
-    // declare the data fetching function
-    const fetchData = async () => {
-      const data = await fetch("/api/companies");
-      const data2 = await data.json();
-      console.log(data2);
-      setStuff1(data2);
-    };
-
-    // call the function
-    fetchData()
-      // make sure to catch any error
-      .catch(console.error);
-  }, []);
+  if (error) {
+    return (
+      <div className="w-full max-w-2xl mx-auto p-4">
+        <AlertMessage
+          type="error"
+          message="Failed to fetch companies!"
+        />
+      </div>
+    );
+  }
 
   return (
-    <main>
-      <h2 className={inter.className}>Quartr</h2>
-      <p className={inter.className}>Trending companies</p>
-      <p>{JSON.stringify(stuff1)}</p>
-    </main>
+    <Suspense fallback={<Loading />}>
+      <div className="w-full max-w-2xl mx-auto p-4">
+        <h2 className="text-xl text-muted-foreground mb-4">
+          Trending companies
+        </h2>
+        <div className="space-y-4">
+          {companies?.map(
+            ({
+              companyId,
+              liveUrl,
+              logoLightUrl,
+              companyName,
+              description,
+            }) => (
+              <CompanyListItem
+                key={companyId}
+                liveUrl={liveUrl}
+                companyId={companyId}
+                companyName={companyName}
+                description={description}
+                logoLightUrl={logoLightUrl}
+              />
+            )
+          )}
+        </div>
+      </div>
+    </Suspense>
   );
 }

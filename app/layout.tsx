@@ -1,4 +1,5 @@
-import "./globals.css";
+import React from "react";
+import "../styles/globals.css";
 
 export default function RootLayout({
   children,
@@ -8,7 +9,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head />
-      <body>{children}</body>
+      <body className="container mx-auto p-4">
+        <main>{children}</main>
+      </body>
     </html>
   );
 }
